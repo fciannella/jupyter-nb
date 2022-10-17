@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-nb
+  namespace: jupyter-nb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-nb
+  template:
+    metadata:
+      labels:
+        app: jupyter-nb
+        name: jupyter-nb
+    spec:
+      nodeSelector:
+        node-type: worker
+      containers:
+      - name: jupyter-nb
+        image: registry.cube.local:5000/jupyter-nb
+        ports:
+        - containerPort: 8888
+        volumeMounts:
+        - name: ipynbvol
+          mountPath: /app/notebooks
+          subPath: jupyter-nb
+      volumes:
+        - name: ipynbvol
+          persistentVolumeClaim:
+            claimName: longhorn-jupyter-nb-pvc
